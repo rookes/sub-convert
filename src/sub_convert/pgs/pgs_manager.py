@@ -1,3 +1,4 @@
+from subprocess import CalledProcessError
 from dataclasses import dataclass
 from collections import Counter
 from itertools import chain
@@ -12,6 +13,7 @@ from pysrt import SubRipFile, SubRipItem, SubRipTime
 from PIL import Image, ImageOps
 from langcodes import Language
 from pymkv import MKVTrack
+from colorama import Fore
 import numpy as np
 
 from ..subtitle.subtitle_group import SubtitleGroup, TimelineItem, Pgs
@@ -67,6 +69,8 @@ class PgsManager:
             f"{self.tmp_path}/{self.mkv_track.file_path}"
             + f"-{self.mkv_track.track_id}-{self.mkv_track.track_codec}.sup"
         )
+
+        final: list[tuple[Image.Image, PgsSubtitleItem]] = []
         try:
             cmd = [
                 "mkvextract",
@@ -92,8 +96,6 @@ class PgsManager:
             self.pgs = Pgs(tmp_location=tmp_file, temp_folder=str(path))
 
             pgs_items = self.pgs.items
-
-            final: list[tuple[Image.Image, PgsSubtitleItem]] = []
             for index, item in enumerate(pgs_items):
                 # Expand border to ensure proper recognition if text is very close to image borders.
                 # Also invert as black-outline texts is saved inverted (as white-outline).
@@ -115,7 +117,12 @@ class PgsManager:
                 image_path.mkdir(parents=True, exist_ok=True)
                 for index, (image, item) in enumerate(final):
                     image.save(f"{image_path}/{index}.png")
-
+        
+        except CalledProcessError:
+            log_msg = ("mkvextract has failed extracting a subtitle"
+                       + f"from: {Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}."
+                       + "Please check the file for a corrupted track. Will skip for now.")
+            logger.critical(Fore.RED + log_msg + Fore.RESET)
         finally:
             shutil.rmtree(path=self.tmp_path)
         return final
