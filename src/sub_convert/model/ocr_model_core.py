@@ -36,9 +36,10 @@ class OCRModelCore:
         del self
 
 
-import torch  # noqa: E402
+from transformers import AutoModelForImageTextToText, AutoProcessor
+import torch 
 
-from ..utils.torch_utils import check_torch_cuda  # noqa: E402
+from sub_convert.utils.torch_utils import check_torch_cuda
 
 
 @dataclass
@@ -51,9 +52,6 @@ class PaddleModelCore(OCRModelCore):
         model_name="PaddlePaddle/PaddleOCR-VL-1.5",
     ):
         super().__init__(options=options)
-
-        from transformers import AutoModelForImageTextToText, AutoProcessor
-
         options = check_torch_cuda(options=options)
         self.torch_device = options["torch_device"]
 
@@ -94,11 +92,7 @@ class PaddleModelCore(OCRModelCore):
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, out)
         ]
-        texts: list[str] = self.processor.batch_decode(
-            generated_ids_trimmed,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=False,
-        )
+        texts: list[str] = self.processor.post_process_image_text_to_text(generated_ids_trimmed)
 
         del inputs, generated_ids_trimmed, out
         return texts

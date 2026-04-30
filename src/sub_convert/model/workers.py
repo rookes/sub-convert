@@ -5,10 +5,11 @@ import logging
 import typing
 
 from torch.multiprocessing import current_process, Queue
+from queue import Empty
 
-from ..pgs.pgs_manager import PgsManager, PgsSubtitleItem
-from ..model.language_model_core import LanguageModelCore
-from ..model.ocr_model_core import OCRModelCore
+from sub_convert.pgs.pgs_manager import PgsManager, PgsSubtitleItem
+from sub_convert.model.language_model_core import LanguageModelCore
+from sub_convert.model.ocr_model_core import OCRModelCore
 
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ class OCRGPUWorker:
 
     def run(self, message_template: list, event, batch_size=16):
         batch = []
+        og_batch_size = batch_size
         memory: dict[int, tuple[str, int]] = {}
 
         last_run_on_track = False
@@ -38,15 +40,17 @@ class OCRGPUWorker:
         while not end:
             try:
                 if not last_run_on_track:
-                    image, return_queue, idx = self.process_queue.get()
+                    image, return_queue, idx = self.process_queue.get(timeout=5)
 
                     tmp_template = deepcopy(message_template)
                     tmp_template[0]["content"][0]["image"] = image
                     batch.append(tmp_template)
                     memory[len(batch) - 1] = (return_queue, idx)
 
+                
                 if len(batch) == batch_size:
                     last_run_on_track = False
+                    batch_size = og_batch_size
 
                     if batch and memory:
                         texts = self.core.analyse(batch=batch)
@@ -58,7 +62,7 @@ class OCRGPUWorker:
                 
                 if event.is_set():
                     end = True
-            except Exception:
+            except Empty:
                 batch_size = len(batch)
                 last_run_on_track = True
 

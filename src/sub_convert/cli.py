@@ -23,12 +23,13 @@ from rich.progress import (
 )
 from rich.progress import TaskID, Task
 from colorama import Fore
+from queue import Empty
 import torch.multiprocessing as mp
 
 
-from .model.workers import OCRGPUWorker, LanguageGPUWorker, CPUWorker
-from .subtitle.subtitle_track_manager import SubtitleTrackManager
-from .model import ocr_model_core, language_model_core
+from sub_convert.model.workers import OCRGPUWorker, LanguageGPUWorker, CPUWorker
+from sub_convert.subtitle.subtitle_track_manager import SubtitleTrackManager
+from sub_convert.model import ocr_model_core, language_model_core
 
 
 logging.basicConfig(
@@ -169,7 +170,7 @@ def progress_bar(task_queue: Queue, progress_queue: Queue, event: Event):
 
                 task = progress.tasks[int(task_id)]
                 tasks[description] = (task_id, task)
-            except Exception:
+            except Empty:
                 pass
 
             try:
@@ -187,7 +188,7 @@ def progress_bar(task_queue: Queue, progress_queue: Queue, event: Event):
                         )
 
                     t_start = time.time()
-            except Exception:
+            except Empty:
                 pass
             
             if event.is_set():
@@ -368,7 +369,7 @@ def sub_convert():
 
     gpu_event = mp.Event()
 
-    gpu_ocr_batchsize = 1
+    gpu_ocr_batchsize = args.batchsize
     gpu_ocr_processes: list[Process] = []
     gpu_core_class = import_class(args.ocr_model_core, ocr_model_core.__name__)
     gpu_core = gpu_core_class(options=options)
@@ -388,7 +389,7 @@ def sub_convert():
         gpu_ocr_processes.append(cess)
     del gpu_core
 
-    gpu_lang_batchsize = 1
+    gpu_lang_batchsize = args.batchsize
     gpu_lang_processes: list[Process] = []
     language_core_class = import_class(
         args.language_model_core, language_model_core.__name__

@@ -97,9 +97,10 @@ class LanguageModelCore:
         del self
 
 
-import torch  # noqa: E402
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch 
 
-from ..utils.torch_utils import check_torch_cuda  # noqa: E402
+from sub_convert.utils.torch_utils import check_torch_cuda
 
 
 @dataclass
@@ -113,9 +114,6 @@ class LangDetectModelCore(LanguageModelCore):
         languages=None,
     ):
         super().__init__(options=options)
-
-        from transformers import AutoTokenizer, AutoModelForSequenceClassification
-
         self.tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=model_name
         )

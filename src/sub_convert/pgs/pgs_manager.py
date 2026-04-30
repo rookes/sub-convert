@@ -16,8 +16,8 @@ from pymkv import MKVTrack
 from colorama import Fore
 import numpy as np
 
-from ..subtitle.subtitle_group import SubtitleGroup, TimelineItem, Pgs
-from ..pgs.pgs_subtitle_item import PgsSubtitleItem
+from sub_convert.subtitle.subtitle_group import SubtitleGroup, TimelineItem, Pgs
+from sub_convert.pgs.pgs_subtitle_item import PgsSubtitleItem
 
 
 logger = logging.getLogger(__name__)

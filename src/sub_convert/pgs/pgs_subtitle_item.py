@@ -1,7 +1,7 @@
 import logging
 import typing
 
-from ..pgs.pgs_segments import (
+from sub_convert.pgs.pgs_segments import (
     PresentationCompositionSegment,
     ObjectDefinitionSegment,
     PgsImage,
