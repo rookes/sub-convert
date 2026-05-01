@@ -59,7 +59,6 @@ class PgsManager:
 
         if self.tmp_path.exists():
             shutil.rmtree(self.tmp_path)
-        
 
         self.pg: Pgs
 
@@ -117,11 +116,13 @@ class PgsManager:
                 image_path.mkdir(parents=True, exist_ok=True)
                 for index, (image, item) in enumerate(final):
                     image.save(f"{image_path}/{index}.png")
-        
+
         except CalledProcessError:
-            log_msg = ("mkvextract has failed extracting a subtitle"
-                       + f"from: {Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}."
-                       + "Please check the file for a corrupted track. Will skip for now.")
+            log_msg = (
+                "mkvextract has failed extracting a subtitle"
+                + f"from: {Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}."
+                + "Please check the file for a corrupted track. Will skip for now."
+            )
             logger.critical(Fore.RED + log_msg + Fore.RESET)
         finally:
             shutil.rmtree(path=self.tmp_path)
@@ -190,12 +191,10 @@ class PgsManager:
 
     def __timeline_events(self, timeline: dict[str, list[TimelineItem]]):
         tmp = list(
-            chain.from_iterable(
-                [
-                    (item.start, item.end)
-                    for item in chain.from_iterable(timeline.values())
-                ]
-            )
+            chain.from_iterable([
+                (item.start, item.end)
+                for item in chain.from_iterable(timeline.values())
+            ])
         )
 
         timeline_events: list[SubRipTime] = []
@@ -346,7 +345,6 @@ class PgsManager:
             forced = True
         path = path + ".forced" if forced else ""
 
-
         average = self.__get_lang_weights(subtitle_groups=subtitle_groups)
         final_lang = max(average, key=average.get)  # type: ignore
 
@@ -354,7 +352,9 @@ class PgsManager:
             if track.effective_language is not None:
                 final_lang = track.effective_language
             else:
-                raise ValueError(f"For some reason we were unable to determine any kind of language for {self.mkv_track.file_path}")
+                raise ValueError(
+                    f"For some reason we were unable to determine any kind of language for {self.mkv_track.file_path}"
+                )
 
         path = path + "." + Language.get(final_lang).to_alpha3(variant="B")
 

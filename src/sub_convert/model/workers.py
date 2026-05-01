@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from copy import deepcopy
 from pathlib import Path
 import logging
 import typing
@@ -30,7 +29,7 @@ class OCRGPUWorker:
         self.core = core
         del queues
 
-    def run(self, message_template: list, event, batch_size=16):
+    def run(self, event, batch_size=16):
         batch = []
         og_batch_size = batch_size
         memory: dict[int, tuple[str, int]] = {}
@@ -41,13 +40,9 @@ class OCRGPUWorker:
             try:
                 if not last_run_on_track:
                     image, return_queue, idx = self.process_queue.get(timeout=5)
-
-                    tmp_template = deepcopy(message_template)
-                    tmp_template[0]["content"][0]["image"] = image
-                    batch.append(tmp_template)
+                    batch.append(image)
                     memory[len(batch) - 1] = (return_queue, idx)
 
-                
                 if len(batch) == batch_size:
                     last_run_on_track = False
                     batch_size = og_batch_size
@@ -59,7 +54,7 @@ class OCRGPUWorker:
 
                         batch.clear()
                         memory.clear()
-                
+
                 if event.is_set():
                     end = True
             except Empty:
@@ -123,16 +118,14 @@ class CPUWorker:
         if not pgs_data:
             return False
 
-        self.task_queue.put(
+        self.task_queue.put((
             (
-                (
-                    f"[cyan]{pgs_manager.hash[0:6]}"
-                    + f"-{Path(pgs_manager.mkv_track.file_path).name}"
-                    + f"-{pgs_manager.mkv_track.track_id}"
-                ),
-                len(pgs_data),
-            )
-        )
+                f"[cyan]{pgs_manager.hash[0:6]}"
+                + f"-{Path(pgs_manager.mkv_track.file_path).name}"
+                + f"-{pgs_manager.mkv_track.track_id}"
+            ),
+            len(pgs_data),
+        ))
 
         queue_index = current_process().name.split("-")[1]
         return_queue = self.queues[f"{queue_index}"]

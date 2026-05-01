@@ -1,5 +1,6 @@
 from importlib.util import find_spec
 from dataclasses import dataclass
+from copy import deepcopy
 import logging
 import os
 
@@ -36,10 +37,10 @@ class OCRModelCore:
         del self
 
 
-from transformers import AutoModelForImageTextToText, AutoProcessor
-import torch 
+from transformers import AutoModelForImageTextToText, AutoProcessor  # noqa: E402
+import torch  # noqa: E402
 
-from sub_convert.utils.torch_utils import check_torch_cuda
+from sub_convert.utils.torch_utils import check_torch_cuda  # noqa: E402
 
 
 @dataclass
@@ -60,7 +61,8 @@ class PaddleModelCore(OCRModelCore):
             attn_implementation = "flash_attention_2"
 
         self.model = (
-            AutoModelForImageTextToText.from_pretrained(
+            AutoModelForImageTextToText
+            .from_pretrained(
                 model_name,
                 dtype=torch.bfloat16,
                 attn_implementation=attn_implementation,
@@ -76,8 +78,29 @@ class PaddleModelCore(OCRModelCore):
 
     def analyse(self, batch: list) -> list[str]:
 
+        # Setup ocr prompt and message template
+        ocr_task = "ocr"
+        prompts = {
+            "ocr": "OCR:",
+        }
+        message_template = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": None},
+                    {"type": "text", "text": prompts[ocr_task]},
+                ],
+            }
+        ]
+
+        messages = []
+        for image in batch:
+            tmp_template = deepcopy(message_template)
+            tmp_template[0]["content"][0]["image"] = image
+            messages.append(tmp_template)
+
         inputs = self.processor.apply_chat_template(
-            batch,
+            messages,
             add_generation_prompt=True,
             tokenize=True,
             return_dict=True,
@@ -92,7 +115,9 @@ class PaddleModelCore(OCRModelCore):
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, out)
         ]
-        texts: list[str] = self.processor.post_process_image_text_to_text(generated_ids_trimmed)
+        texts: list[str] = self.processor.post_process_image_text_to_text(
+            generated_ids_trimmed
+        )
 
         del inputs, generated_ids_trimmed, out
         return texts
