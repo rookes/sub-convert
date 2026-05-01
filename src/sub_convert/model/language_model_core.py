@@ -97,10 +97,10 @@ class LanguageModelCore:
         del self
 
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch 
+from transformers import AutoTokenizer, AutoModelForSequenceClassification  # noqa: E402
+import torch  # noqa: E402
 
-from sub_convert.utils.torch_utils import check_torch_cuda
+from sub_convert.utils.torch_utils import check_torch_cuda  # noqa: E402
 
 
 @dataclass
@@ -128,7 +128,8 @@ class LangDetectModelCore(LanguageModelCore):
             attn_implementation = "flash_attention_2"
 
         self.model = (
-            AutoModelForSequenceClassification.from_pretrained(
+            AutoModelForSequenceClassification
+            .from_pretrained(
                 pretrained_model_name_or_path=model_name,
                 num_labels=45,
                 dtype=torch.float16,

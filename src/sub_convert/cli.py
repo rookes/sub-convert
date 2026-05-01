@@ -124,7 +124,7 @@ def get_candidates(root: Path, options: dict) -> list[Path]:
                     files.append(file.absolute())
             else:
                 files.append(file.absolute())
-    
+
     return files
 
 
@@ -156,10 +156,18 @@ def progress_bar(task_queue: Queue, progress_queue: Queue, event: Event):
         while not end:
             match t_end - t_start:
                 case 20:
-                    logger.info(Fore.YELLOW + "Still here just waiting on files, will warn again if it should take longer" + Fore.RESET)
+                    logger.info(
+                        Fore.YELLOW
+                        + "Still here just waiting on files, will warn again if it should take longer"
+                        + Fore.RESET
+                    )
                     t_end = time.time()
                 case 360:
-                    logger.info(Fore.RED + "Took 5 minutes and still no new file, something is up" + Fore.RESET)
+                    logger.info(
+                        Fore.RED
+                        + "Took 5 minutes and still no new file, something is up"
+                        + Fore.RESET
+                    )
                     t_end = time.time()
 
             try:
@@ -177,20 +185,16 @@ def progress_bar(task_queue: Queue, progress_queue: Queue, event: Event):
                 description = progress_queue.get_nowait()
                 if description in tasks:
                     task_id = tasks[description][0]
-                    progress.update(
-                        task_id=task_id, advance=1, visible=True
-                    )
+                    progress.update(task_id=task_id, advance=1, visible=True)
 
                     task = tasks[description][1]
                     if task.finished:
-                        progress.update(
-                            task_id=task.id, refresh=True, visible=False
-                        )
+                        progress.update(task_id=task.id, refresh=True, visible=False)
 
                     t_start = time.time()
             except Empty:
                 pass
-            
+
             if event.is_set():
                 end = True
 
@@ -311,10 +315,18 @@ def sub_convert():
     # Get mkv files to extract subtitles from
     convertibles = get_candidates(root=root, options=options)
     if not convertibles:
-        logger.info(Fore.YELLOW + "No files to convert found, if you expected files to be converted, check if that path is accessible." + Fore.RESET)
+        logger.info(
+            Fore.YELLOW
+            + "No files to convert found, if you expected files to be converted, check if that path is accessible."
+            + Fore.RESET
+        )
         exit()
 
-    logger.info(Fore.CYAN + "Files to convert found, setting up ModelCore, this can take a while." + Fore.RESET)
+    logger.info(
+        Fore.CYAN
+        + "Files to convert found, setting up ModelCore, this can take a while."
+        + Fore.RESET
+    )
     pgs_managers = chain.from_iterable(
         (
             SubtitleTrackManager(file_path=path).get_pgs_managers(options=options)
@@ -323,21 +335,6 @@ def sub_convert():
     )
 
     # pgs_managers = [list(pgs_managers)[0]]
-
-    # Setup ocr prompt and message template
-    ocr_task = "ocr"
-    prompts = {
-        "ocr": "OCR:",
-    }
-    message_template = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "image", "image": None},
-                {"type": "text", "text": prompts[ocr_task]},
-            ],
-        }
-    ]
 
     try:
         set_start_method("spawn", force=True)
@@ -374,17 +371,20 @@ def sub_convert():
     gpu_core_class = import_class(args.ocr_model_core, ocr_model_core.__name__)
     gpu_core = gpu_core_class(options=options)
 
-    logger.info(Fore.CYAN + f"Setting up OCRModelCore: {gpu_core.__class__.__name__}" + Fore.RESET)
+    logger.info(
+        Fore.CYAN
+        + f"Setting up OCRModelCore: {gpu_core.__class__.__name__}"
+        + Fore.RESET
+    )
     for idx in range(0, gpu_ocr_workers):
         cess = Process(
-                target=OCRGPUWorker(gpu_core, queues).run, # type: ignore
-                name=f"OCRGPU{idx}",
-                args=(
-                    message_template,
-                    gpu_event,
-                    gpu_ocr_batchsize,
-                ),
-            )
+            target=OCRGPUWorker(gpu_core, queues).run,  # type: ignore
+            name=f"OCRGPU{idx}",
+            args=(
+                gpu_event,
+                gpu_ocr_batchsize,
+            ),
+        )
 
         gpu_ocr_processes.append(cess)
     del gpu_core
@@ -396,13 +396,20 @@ def sub_convert():
     )
     lang_core = language_core_class(options=options)
 
-    logger.info(Fore.CYAN + f"Setting up LanguageModelCore: {lang_core.__class__.__name__}" + Fore.RESET)
+    logger.info(
+        Fore.CYAN
+        + f"Setting up LanguageModelCore: {lang_core.__class__.__name__}"
+        + Fore.RESET
+    )
     for idx in range(0, gpu_lang_workers):
         cess = Process(
-                target=LanguageGPUWorker(lang_core, queues).run, # type: ignore
-                name=f"LanguageGPU{idx}",
-                args=(gpu_event, gpu_lang_batchsize, ),
-            )
+            target=LanguageGPUWorker(lang_core, queues).run,  # type: ignore
+            name=f"LanguageGPU{idx}",
+            args=(
+                gpu_event,
+                gpu_lang_batchsize,
+            ),
+        )
 
         gpu_lang_processes.append(cess)
     del lang_core
@@ -412,13 +419,20 @@ def sub_convert():
     task_queue = queues["task_queue"]
     progress_queue = queues["progress_queue"]
     event = Event()
-    thread = Thread(target=progress_bar, args=(task_queue, progress_queue, event,))
+    thread = Thread(
+        target=progress_bar,
+        args=(
+            task_queue,
+            progress_queue,
+            event,
+        ),
+    )
 
     try:
         for process in processes:
             process.start()
 
-        runnable = CPUWorker(queues=queues) # type: ignore
+        runnable = CPUWorker(queues=queues)  # type: ignore
         del queues
 
         thread.start()
@@ -432,12 +446,12 @@ def sub_convert():
         pass
 
     finally:
-        event.set() 
+        event.set()
         thread.join()
         gpu_event.set()
         for process in processes:
             process.terminate()
             process.join()
             process.close()
-    
+
     logger.info(Fore.GREEN + "Finished" + Fore.RESET)
