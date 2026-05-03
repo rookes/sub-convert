@@ -357,6 +357,6 @@ inventories = ["https://docs.python.org/3/objects.inv"]
 paths = ["."]
 
 [project.plugins.mkdocstrings.handlers.python.options]
-docstring_style = "google"
+docstring_style = "numpy"
 inherited_members = true
 show_source = false

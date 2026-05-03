@@ -32,7 +32,7 @@ For more information on PGS, the issue encountered & the solution provided, plea
 - keep pure `CPU` support with [pytesseract](https://github.com/madmaze/pytesseract) & [lingua-py](https://github.com/pemistahl/lingua-py) 
 - add [PaddlePaddle/PaddleOCR-VL-1.5](https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5) as the main OCR, tesseract exists as a fallback
 - add [Mike0307/multilingual-e5-language-detection](https://huggingface.co/Mike0307/multilingual-e5-language-detection) for language detection
-- properly handle [Fades (In / Out)](pgs.md#fades-in--out), [Overlaps](pgs.md#overlaps), empty images. etc
+- properly handle [Fades (In / Out)](pgs.md#fades-in-out), [Overlaps](pgs.md#overlaps), empty images. etc
 - assume subtitles is forced if less than 150 subtitles items are with the track, otherwise set flag if set in original file
 - parallelism via `multiprocessing`, 4 different subtitles track will be converted at a time (can be configured)
 
