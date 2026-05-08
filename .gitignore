@@ -39,3 +39,7 @@ site
 !tests/files/for-main/test-no-adjacent.mkv
 !tests/files/for-pgs/test.7z
 !docs/files/example.png
+!docs/files/86.png
+!docs/files/image.png
+!docs/files/hells paradise example.png
+!docs/files/hells paradise timeline view.png
