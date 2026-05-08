@@ -48,7 +48,7 @@ A image is continuously displayed as long as the following DisplaySet calls for 
 
 While color palettes can be defined new in each DisplaySet they can also be omitted, this means the prior palette is to be used again.
 
-These combinations of segment types and DisplaySets allow for PGS to display [overlaps](#overlaps), [fades](#fades-in--out) or [cropped images](#cropped-images), which will be described further.
+These combinations of segment types and DisplaySets allow for PGS to display [overlaps](#overlaps), [fades](#fades-in-out) or [cropped images](#cropped-images), which will be described further.
 
 ## Overlaps
 
