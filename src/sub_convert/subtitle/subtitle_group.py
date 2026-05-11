@@ -513,7 +513,7 @@ class Pgs:
                 tmp.append(ds)
             elif (
                 len(ds.ods_segments) == 0
-                and len(ds.pds_segments) == 0
+                #and len(ds.pds_segments) == 0
                 and ds.is_normal()
                 and ds.pcs.size == 11
             ):
