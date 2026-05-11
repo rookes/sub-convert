@@ -8,6 +8,7 @@ import logging
 import hashlib
 import typing
 import shutil
+import sys
 
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from PIL import Image, ImageOps
@@ -64,10 +65,7 @@ class PgsManager:
 
     def get_pgs_images(self) -> list[tuple[Image.Image, PgsSubtitleItem]]:
         self.tmp_path.mkdir(parents=True)
-        tmp_file = (
-            f"{self.tmp_path}/{self.mkv_track.file_path}"
-            + f"-{self.mkv_track.track_id}-{self.mkv_track.track_codec}.sup"
-        )
+        tmp_file = f"{self.tmp_path}/{Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}-{self.mkv_track.track_codec}.sup"
 
         final: list[tuple[Image.Image, PgsSubtitleItem]] = []
         try:
@@ -91,7 +89,7 @@ class PgsManager:
                 ).absolute()
                 path.mkdir(parents=True, exist_ok=True)
 
-            subprocess.check_output(cmd)
+            subprocess.check_output(cmd, stderr=subprocess.PIPE)
             self.pgs = Pgs(tmp_location=tmp_file, temp_folder=str(path))
 
             pgs_items = self.pgs.items
@@ -121,7 +119,7 @@ class PgsManager:
             log_msg = (
                 "mkvextract has failed extracting a subtitle "
                 + f"from: {Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}. "
-                + f"Please check the file for a corrupted track. Will skip for now. More details: {e}"
+                + f"Please check the file for a corrupted track. Will skip for now. More details: \n {e.output.decode(sys.getfilesystemencoding())}"
             )
             logger.critical(Fore.RED + log_msg + Fore.RESET)
         finally:
@@ -191,12 +189,10 @@ class PgsManager:
 
     def __timeline_events(self, timeline: dict[str, list[TimelineItem]]):
         tmp = list(
-            chain.from_iterable(
-                [
-                    (item.start, item.end)
-                    for item in chain.from_iterable(timeline.values())
-                ]
-            )
+            chain.from_iterable([
+                (item.start, item.end)
+                for item in chain.from_iterable(timeline.values())
+            ])
         )
 
         timeline_events: list[SubRipTime] = []
