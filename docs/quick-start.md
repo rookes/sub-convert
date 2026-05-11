@@ -18,6 +18,13 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 
 In the future the project will be entirely switched over to uv, however due to various dependency conflicts with pytorch, rocm, flash_attn and alike, simple install script are the way to go. Until I can figure out a proper, native uv project, there will be no build for this project.
 
+You will also have to installed `mkvtoolnix` for your flavor of Linux. For ubuntu simply run:
+
+```cli
+sudo apt update
+sudo apt install mkvtoolnix
+```
+
 **NOTICE**
 
 Supported: Linux, Windows has not been tested.
