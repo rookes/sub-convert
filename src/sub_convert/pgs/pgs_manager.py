@@ -117,11 +117,11 @@ class PgsManager:
                 for index, (image, item) in enumerate(final):
                     image.save(f"{image_path}/{index}.png")
 
-        except CalledProcessError:
+        except CalledProcessError as e:
             log_msg = (
-                "mkvextract has failed extracting a subtitle"
-                + f"from: {Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}."
-                + "Please check the file for a corrupted track. Will skip for now."
+                "mkvextract has failed extracting a subtitle "
+                + f"from: {Path(self.mkv_track.file_path).name}-{self.mkv_track.track_id}. "
+                + f"Please check the file for a corrupted track. Will skip for now. More details: {e}"
             )
             logger.critical(Fore.RED + log_msg + Fore.RESET)
         finally:
@@ -191,10 +191,12 @@ class PgsManager:
 
     def __timeline_events(self, timeline: dict[str, list[TimelineItem]]):
         tmp = list(
-            chain.from_iterable([
-                (item.start, item.end)
-                for item in chain.from_iterable(timeline.values())
-            ])
+            chain.from_iterable(
+                [
+                    (item.start, item.end)
+                    for item in chain.from_iterable(timeline.values())
+                ]
+            )
         )
 
         timeline_events: list[SubRipTime] = []
