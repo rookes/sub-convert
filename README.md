@@ -35,6 +35,14 @@ sudo apt update
 sudo apt install mkvtoolnix
 ```
 
+The default `OCRModelCore` runs with `tesseract`, which you need to installed with:
+
+```cli
+sudo apt install tesseract-ocr
+```
+
+For more options please visit [tesseract-ocr](https://tesseract-ocr.github.io/tessdoc/Installation.html)
+
 **NOTICE**
 
 Supported: Linux, Windows has not been tested.
