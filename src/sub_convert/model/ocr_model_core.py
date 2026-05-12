@@ -21,9 +21,8 @@ class OCRModelCore:
 
         texts: list[str] = []
         for entry in batch:
-            image = entry[0]["content"][0]["image"]
             text = tess.image_to_string(
-                image=image, config="--oem 1 -l eng+deu+deu_frak+deu_latf+jpn"
+                image=entry, config="--oem 1 -l eng+deu+deu_frak+deu_latf+jpn"
             )
 
             # Small static fix for tesseract, might want to make this togglable in the future.
