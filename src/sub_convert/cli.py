@@ -291,6 +291,13 @@ def sub_convert():
         help="Size of the batch send to the OCR model. USE WITH CAUTION ON AMD GPU! Default: 1",
     )
     parser.add_argument(
+        "-t",
+        "--torch_device",
+        choices=["cpu", "cuda", "xpu"],
+        default=None,
+        help="Manually overwrite the selected torch device to: cpu | cuda | xpu",
+    )
+    parser.add_argument(
         "-d",
         "--dump-debug",
         action="store_true",
@@ -308,6 +315,7 @@ def sub_convert():
         "skip_if_existing": args.skip_if_exists,
         "convert_aged": args.convert_aged,
         "dump_debug": args.dump_debug,
+        "torch_device": args.torch_device,
     }
 
     root = Path(args.path)
