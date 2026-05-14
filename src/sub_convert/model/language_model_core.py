@@ -118,13 +118,14 @@ class LangDetectModelCore(LanguageModelCore):
             pretrained_model_name_or_path=model_name
         )
 
-        options = check_torch_cuda(options=options)
-        self.torch_device = (
-            options["torch_device"] if "torch_device" in options else "cpu"
-        )
+        self.torch_device = ""
+        if options["torch_device"] is None or options["torch_device"] == "cuda":
+            options = check_torch_cuda(options=options)
+
+        self.torch_device = options["torch_device"]
 
         attn_implementation = "paged|sdpa"
-        if find_spec("flash_attn") is not None:
+        if find_spec("flash_attn") is not None and self.torch_device == "cuda":
             attn_implementation = "flash_attention_2"
 
         self.model = (
