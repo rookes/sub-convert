@@ -49,7 +49,7 @@ class PaddleModelCore(OCRModelCore):
     def __init__(
         self,
         options: dict,
-        model_name="PaddlePaddle/PaddleOCR-VL-1.5",
+        model_name="PaddlePaddle/PaddleOCR-VL-1.6",
     ):
         super().__init__(options=options)
         self.torch_device = ""
