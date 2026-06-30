@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "convert image-based subtitles to text-based via OCR and language recognition"
 readme = "README.md"
 authors = [{ name = "leuchthelp", email = "gfpinthehouse@gmail.com" }]
+license = { file = "LICENSE" }
 requires-python = ">=3.14"
 dependencies = [
     "colorama>=0.4.6",
