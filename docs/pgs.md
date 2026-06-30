@@ -8,7 +8,7 @@ Continuing further it is assumed you understand the concepts of DisplaySets, the
 
 **A couple basics first:**
 
-PGS match the displayed resolution, usually 1920x1080p, to display images on screen at specific timestamps. These images are entirely transparent (Alpha) and include any styling & orientation defined for each text region. See the following example from [Jujutsu Kaisen Season 1 Episode 14](https://www.imdb.com/title/tt13847654/?ref_=ttep_ep_14): 
+PGS match the displayed resolution, usually 1920x1080p, to display images on screen at specific timestamps. These images are entirely transparent (Alpha) and include any styling & orientation defined for each text region. See the following example from [Jujutsu Kaisen Season 1 Episode 14](https://www.imdb.com/title/tt13847654/?ref_=ttep_ep_14):
 
 ![](files/image.png)
 
@@ -25,7 +25,7 @@ DS[0]
 	type=END, pts=00:00:33,534, dts=00:00:00,000, size=0
 ```
 
-What you see here is a typical `EPOCH_START` or `START` segment which marks a group of DisplaySets that are in relationship to one another. There can be any number of DisplaySets after and the epoch lasts until the next `START` segment has been encountered. 
+What you see here is a typical `EPOCH_START` or `START` segment which marks a group of DisplaySets that are in relationship to one another. There can be any number of DisplaySets after and the epoch lasts until the next `START` segment has been encountered.
 
 However, usually there is some kind of `END` segment which is not specifically defined prior to a `START`. They look something like this:
 
@@ -44,7 +44,7 @@ In addition to `START` & `END` statements PGS also has `NORMAL_CASE` and it's sp
 
 A image is continuously displayed as long as the following DisplaySet calls for the exact same `object_id` defined by the DisplaySet which first initialized the image. This metadata is carried within the CompositionObjects.
 
-*However, there is an exception to this rule:* a DisplaySet can initialize another image with the same `object_id`. This effectively means the image is overwritten or updated entirely.
+_However, there is an exception to this rule:_ a DisplaySet can initialize another image with the same `object_id`. This effectively means the image is overwritten or updated entirely.
 
 While color palettes can be defined new in each DisplaySet they can also be omitted, this means the prior palette is to be used again.
 
@@ -52,7 +52,7 @@ These combinations of segment types and DisplaySets allow for PGS to display [ov
 
 ## Overlaps
 
-First overlap describes PGS images overlapping by their display timestamp / time-ranges. Two images can overlap at the same time, extending shortly before or after. 
+First overlap describes PGS images overlapping by their display timestamp / time-ranges. Two images can overlap at the same time, extending shortly before or after.
 
 Overlaps are possible in PGS, spanning arbitrary time within an epoch, by displaying up to 2 Windows within the stream. Additionally overlaps can also be displayed by combining 2 or more text-regions within a single image.
 

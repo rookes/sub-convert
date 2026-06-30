@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: ["3.14"]
     steps:
     - uses: actions/checkout@v6
 
@@ -22,7 +22,7 @@ jobs:
         enable-cache: true
 
     - name: Install the project
-      run: bash install-base.sh
+      run: uv sync --extra cpu
 
     - name: Analyzing the code with ruff
       run: |

@@ -2,17 +2,17 @@
 
 ![](docs/files/example.png)
 
-**WARNING** current only tested for AMD GPUs and CPU, needs testing for other vendors, see the [Installation guide](https://leuchthelp.github.io/sub-convert/quick-start/#installation-guide) 
+**WARNING** current only tested for AMD GPUs and CPU, needs testing for other vendors, see the [Installation guide](https://leuchthelp.github.io/sub-convert/quick-start/#installation-guide)
 
-sub-convert is a simple project inspired by [pgsrip](https://github.com/ratoaq2/pgsrip) by [ratoaq2](https://github.com/ratoaq2). It is meant to convert PGS (image-based) subtitles to SRT (text-based) subtitles using a shared OCR model which `N` processes can request `image-to-text` conversion from. 
+sub-convert is a simple project inspired by [pgsrip](https://github.com/ratoaq2/pgsrip) by [ratoaq2](https://github.com/ratoaq2). It is meant to convert PGS (image-based) subtitles to SRT (text-based) subtitles using a shared OCR model which `N` processes can request `image-to-text` conversion from.
 
 Please refer to the [current roadmap](#current-roadmap) for information on future development.
 
-It tries to overcome some of the key [shortcomings](#shortcomings-include) of pgsrip. However some parts of pgsrip have been retained, more specifically the PGS parser build by [ratoaq2](https://github.com/ratoaq2), which as since been improved to be feature complete with [this documentation](https://blog.thescorpius.com/index.php/2017/07/15/presentation-graphic-stream-sup-files-bluray-subtitle-format/). 
+It tries to overcome some of the key [shortcomings](#shortcomings-include) of pgsrip. However some parts of pgsrip have been retained, more specifically the PGS parser build by [ratoaq2](https://github.com/ratoaq2), which as since been improved to be feature complete with [this documentation](https://blog.thescorpius.com/index.php/2017/07/15/presentation-graphic-stream-sup-files-bluray-subtitle-format/).
 
 ## Installation guide
 
-Requires `python >= 3.12`
+Requires `python >= 3.14`
 
 The project currently interfaces with the models through huggingfaces [transformers](https://huggingface.co/docs/transformers/index).
 
@@ -21,12 +21,14 @@ First install uv:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
 or
+
 ```bash
 wget -qO- https://astral.sh/uv/install.sh | sh
 ```
 
-In the future the project will be entirely switched over to uv, however due to various dependency conflicts with pytorch, rocm, flash_attn and alike, simple install script are the way to go. Until I can figure out a proper, native uv project, there will be no build for this project.
+This project is entirely managed by uv and offers build as well as optional dependencies for whichever configuration is best suited for your environment. Read more below.
 
 You will also have to installed `mkvtoolnix` for your flavor of Linux. For ubuntu simply run:
 
@@ -45,9 +47,11 @@ For more options please visit [tesseract-ocr](https://tesseract-ocr.github.io/te
 
 **NOTICE**
 
-Supported: Linux, Windows has not been tested.
+**Supported: Linux**
 
-Make sure to install any framework required by your GPU beforehand. 
+> Windows has not been tested.
+
+Make sure to install any framework required by your GPU beforehand.
 
 For rocm follow [these instructions](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html) and install rocm,
 
@@ -55,21 +59,16 @@ for cuda follow [these instructions](https://developer.nvidia.com/cuda-downloads
 
 for openvino follow [these instructions](https://docs.openvino.ai/2025/get-started/install-openvino/configurations/configurations-intel-gpu.html) and install openvino.
 
-There are five install script denoted with their respective platform:
+There are four optional dependencies denoted with their respective platform:
 
 ```bash
--rocm
--cuda
--openvino
--base
--macos
+cpu
+rocm
+cuda
+openvino
 ```
 
-Simply execute the matching script with `bash install-{choice}.sh`
-
-[flash-attention](https://github.com/Dao-AILab/flash-attention) is optional but will be installed for the [rocm](install-rocm.sh) & [cuda](install-cuda.sh), as it has been validated to work.
-
-If you do not install flash_attention, the tool will fallback to pytorches integrated [sdpa](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html) attention backend, which should work on all platforms.
+Simply execute the matching script with `uv sync --extra {choice}` or install from [pypi](https://pypi.org/project/sub-convert2/) as `uv add sub-convert2[{choice}]` or `pip install sub-convert2[{choice}]`. For `macos` simply install with `uv add sub-convert2[cpu]` or `pip install sub-convert2[{cpu]` as the dependencies are the same.
 
 ## Usage
 
@@ -84,6 +83,7 @@ or
 
 uv run sub-convert -p test-files
 ```
+
 To optimize on resource usage the tool utilizes generators and draws files to convert lazily when needed.
 
 This however, results in the tool not being able to tell how many files it will convert in total and if it has converted any to begin with. If it exists without an error while not showing a single progressbar, it most likely has not found any files to convert. In that case make sure to check if the path you have given sub-convert is accessible.
@@ -93,35 +93,36 @@ When files are being saved, existing files can also be override by specifying:
 ```bash
 sub-convert -o
 
-or 
+or
 
 uv run sub-convert -o
 ```
 
-You can switch the type of OCR or language model-core you want to use by supplying `-om` or `-lm`. 
+You can switch the type of OCR or language model-core you want to use by supplying `-om` or `-lm`.
 
 To see the cores available simply run `sub-convert --help` and they will be listed for both options.
 
-Using `-a` lets you define a point in time after or before which all existing `.srt` files will be replaced and their original `.mkv` will be processed. All files outside this range will be skipped. 
+Using `-a` lets you define a point in time after or before which all existing `.srt` files will be replaced and their original `.mkv` will be processed. All files outside this range will be skipped.
 
 ```bash
 -a d+1
 ```
+
 means: all files older than 1 day will be processed, younger files will be skipped
 
 ```bash
--a w-1 #possible: ms, s, m (minutes), d, h, w, M (months), y 
+-a w-1 #possible: ms, s, m (minutes), d, h, w, M (months), y
 ```
-means: all files younger than 1 week will be processed, older files will be skipped
 
+means: all files younger than 1 week will be processed, older files will be skipped
 
 Using `-s` will skip files for which subtitles already exist. Due to the fact that naming cannot be inferred back to the tracks within a file no track will be processed even if the subtitles found only belong to one of multiple tracks in the `MKV` file.
 
-The current architecture allows you to launch `N` OCR model GPU workers followed by `N` language model GPU workers. `N=4` CPU workers each work on a single subtitle track for which `pgs images` corresponding to the amount of images found in the track are processed. Each image instance is processed one-by-one. 
+The current architecture allows you to launch `N` OCR model GPU workers followed by `N` language model GPU workers. `N=4` CPU workers each work on a single subtitle track for which `pgs images` corresponding to the amount of images found in the track are processed. Each image instance is processed one-by-one.
 
-Each worker is launches as a separate process meaning you will need at least `N_cw + N_ow + N_lw + 2` threads available on your system. The default is 6 threads meaning a 3 core CPU with 2 threads per core is required at the very least. The extra `+2` are Managers with handle communication between processes via `Queues`. One manager controls the GPU queues, while the other controls the CPU and progress queues (used for progress bar). 
+Each worker is launches as a separate process meaning you will need at least `N_cw + N_ow + N_lw + 2` threads available on your system. The default is 6 threads meaning a 3 core CPU with 2 threads per core is required at the very least. The extra `+2` are Managers with handle communication between processes via `Queues`. One manager controls the GPU queues, while the other controls the CPU and progress queues (used for progress bar).
 
-All CPU workers queue their images towards a global GPU queue. OCR GPU workers than draw items from the first queue and processes the images. Once processed the extracted text is passed through another queue towards the language model workers which classify the language of the text. 
+All CPU workers queue their images towards a global GPU queue. OCR GPU workers than draw items from the first queue and processes the images. Once processed the extracted text is passed through another queue towards the language model workers which classify the language of the text.
 
 Finally the language model workers send the text with the language classification back to the CPU worker who initially processes this item, ensuring processed tracks remain consistent and ordered.
 
@@ -135,5 +136,5 @@ The amount of workers can be adjusted with the following arguments:
 
 Additionally the `-b, --batchsize` arguments exists to batch images for inference, however, this options has not been tested much due to AMD GPU crashes for `rocm/pytorch` docker containers - use with caution.
 
-Lastly, `-d` dumps debug files like - DisplaySet, all associated images, TimelineItems exported as images, TimelineItems exported as Pandas Dataframe in JSON. 
+Lastly, `-d` dumps debug files like - DisplaySet, all associated images, TimelineItems exported as images, TimelineItems exported as Pandas Dataframe in JSON.
 Ploty & Kaleido need to be installed for this, as well as any version of Google Chrome. Otherwise plotly will be unabled to export an image visualization of the TimelineItems as `.svg`.

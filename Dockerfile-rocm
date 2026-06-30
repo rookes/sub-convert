@@ -15,4 +15,4 @@ RUN source $HOME/.local/bin/env
 
 RUN git clone https://github.com/leuchthelp/sup-convert.git
 WORKDIR /sup-convert
-RUN bash install-rocm.sh
+RUN uv sync --extra rocm
