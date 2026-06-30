@@ -6,9 +6,9 @@ import typing
 from torch.multiprocessing import current_process, Queue
 from queue import Empty
 
-from sub_convert.pgs.pgs_manager import PgsManager, PgsSubtitleItem
-from sub_convert.model.language_model_core import LanguageModelCore
-from sub_convert.model.ocr_model_core import OCRModelCore
+from sub_convert2.pgs.pgs_manager import PgsManager, PgsSubtitleItem
+from sub_convert2.model.language_model_core import LanguageModelCore
+from sub_convert2.model.ocr_model_core import OCRModelCore
 
 
 logger = logging.getLogger(__name__)

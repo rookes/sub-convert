@@ -5,9 +5,9 @@ import typing
 import json
 import os
 
-from sub_convert.pgs.pgs_segments import PgsReader, DisplaySet
-from sub_convert.pgs.pgs_subtitle_item import PgsSubtitleItem, Palette
-from sub_convert.subtitle.timeline import (
+from sub_convert2.pgs.pgs_segments import PgsReader, DisplaySet
+from sub_convert2.pgs.pgs_subtitle_item import PgsSubtitleItem, Palette
+from sub_convert2.subtitle.timeline import (
     TimelineItem,
     look_to_combine,
     gen_timelines,

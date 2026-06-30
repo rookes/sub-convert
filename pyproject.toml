@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-sub-convert = "sub_convert.cli:sub_convert"
+sub-convert = "sub_convert2.cli:sub_convert"
 
 [project.optional-dependencies]
 cpu = [

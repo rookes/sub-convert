@@ -100,7 +100,7 @@ class LanguageModelCore:
 from transformers import AutoTokenizer, AutoModelForSequenceClassification  # noqa: E402
 import torch  # noqa: E402
 
-from sub_convert.utils.torch_utils import check_torch_cuda  # noqa: E402
+from sub_convert2.utils.torch_utils import check_torch_cuda  # noqa: E402
 
 
 @dataclass

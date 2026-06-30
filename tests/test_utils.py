@@ -1,7 +1,7 @@
 import pytest
 
-from sub_convert.utils import utils
-from sub_convert.utils import torch_utils
+from sub_convert2.utils import utils
+from sub_convert2.utils import torch_utils
 
 
 @pytest.mark.parametrize(

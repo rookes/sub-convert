@@ -27,9 +27,9 @@ from queue import Empty
 import torch.multiprocessing as mp
 
 
-from sub_convert.model.workers import OCRGPUWorker, LanguageGPUWorker, CPUWorker
-from sub_convert.subtitle.subtitle_track_manager import SubtitleTrackManager
-from sub_convert.model import ocr_model_core, language_model_core
+from sub_convert2.model.workers import OCRGPUWorker, LanguageGPUWorker, CPUWorker
+from sub_convert2.subtitle.subtitle_track_manager import SubtitleTrackManager
+from sub_convert2.model import ocr_model_core, language_model_core
 
 
 logging.basicConfig(
