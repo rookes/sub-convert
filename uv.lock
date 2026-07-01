@@ -1809,8 +1809,8 @@ requires-dist = [
     { name = "transformers", marker = "extra == 'cuda'", specifier = ">=5.12.1" },
     { name = "transformers", marker = "extra == 'openvino'", specifier = ">=5.12.1" },
     { name = "transformers", marker = "extra == 'rocm'", specifier = ">=5.12.1" },
-    { name = "triton-rocm", marker = "extra == 'rocm'", index = "https://download.pytorch.org/whl/rocm7.2", conflict = { package = "sub-convert2", extra = "rocm" } },
-    { name = "triton-xpu", marker = "extra == 'openvino'", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "sub-convert2", extra = "openvino" } },
+    { name = "triton-rocm", marker = "extra == 'rocm'", specifier = ">=3.7.1", index = "https://download.pytorch.org/whl/rocm7.2", conflict = { package = "sub-convert2", extra = "rocm" } },
+    { name = "triton-xpu", marker = "extra == 'openvino'", specifier = ">=3.7.1", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "sub-convert2", extra = "openvino" } },
 ]
 provides-extras = ["cpu", "cuda", "openvino", "rocm"]
 

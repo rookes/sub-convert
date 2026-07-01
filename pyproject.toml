@@ -1,6 +1,6 @@
 [project]
 name = "sub-convert2"
-version = "0.1.0"
+version = "0.1.0rc1"
 description = "convert image-based subtitles to text-based via OCR and language recognition"
 readme = "README.md"
 authors = [{ name = "leuchthelp", email = "gfpinthehouse@gmail.com" }]
@@ -38,14 +38,14 @@ openvino = [
     "accelerate>=1.14.0",
     "torch>=2.12.1",
     "torchvision",
-    "triton-xpu",
+    "triton-xpu>=3.7.1",
     "transformers>=5.12.1",
 ]
 rocm = [
     "accelerate>=1.14.0",
     "torch>=2.12.1",
     "torchvision",
-    "triton-rocm",
+    "triton-rocm>=3.7.1",
     "transformers>=5.12.1",
 ]
 
