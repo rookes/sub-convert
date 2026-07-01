@@ -1,4 +1,4 @@
-FROM rocm/pytorch:rocm7.2.2_ubuntu24.04_py3.12_pytorch_release_2.10.0
+FROM rocm/pytorch:rocm7.2.4_ubuntu24.04_py3.12_pytorch_release_2.10.0
 
 RUN apt-get clean && apt-get update && apt-get install -y locales
 RUN locale-gen en_US.UTF-8
@@ -10,10 +10,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
 RUN apt-get update && apt-get -y install google-chrome-stable
 
-RUN pip install --upgrade pip
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-ENV FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE"
-RUN . /opt/venv/bin/activate
-RUN git clone https://github.com/ROCm/flash-attention.git &&\ 
-    cd flash-attention &&\
-    FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE" pip install --no-deps --no-build-isolation .
+RUN uv sync --extra rocm
