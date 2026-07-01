@@ -1,6 +1,6 @@
 [project]
 name = "sub-convert2"
-version = "0.1.0"
+version = "0.1.0rc1"
 description = "convert image-based subtitles to text-based via OCR and language recognition"
 readme = "README.md"
 authors = [{ name = "leuchthelp", email = "gfpinthehouse@gmail.com" }]
