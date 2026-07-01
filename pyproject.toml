@@ -38,14 +38,14 @@ openvino = [
     "accelerate>=1.14.0",
     "torch>=2.12.1",
     "torchvision",
-    "triton-xpu",
+    "triton-xpu>=3.7.1",
     "transformers>=5.12.1",
 ]
 rocm = [
     "accelerate>=1.14.0",
     "torch>=2.12.1",
     "torchvision",
-    "triton-rocm",
+    "triton-rocm>=3.7.1",
     "transformers>=5.12.1",
 ]
 
